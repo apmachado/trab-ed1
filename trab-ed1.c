@@ -3,7 +3,6 @@
 
 typedef struct viz{
 	int id_viz;
-	int custo;
 	struct viz *prox_viz;
 }TViz;
 
@@ -72,7 +71,7 @@ void insere_aresta(TG *g, int no1, int no2, int orientacao){
 	v->id_viz = no2;
 	v->prox_viz = p1->prim_viz;
 	p1->prim_viz = v;
-	if(!orientacao){
+	if(!orientacao){ //não sendo orientado, insere no sentido inverso também
 		TViz *u = (TViz*)malloc(sizeof(TViz));
 		u->id_viz = no1;
 		u->prox_viz = p2->prim_viz;
@@ -101,7 +100,7 @@ void retira_aresta(TG *g, int no1, int no2, int orientacao){
 		ant->prox_viz = v->prox_viz;
 		free(v);
 	}
-	if(!orientacao){
+	if(!orientacao){ //não sendo orientado, retira no sentido inverso também
 		v = p2->prim_viz;
 		while(v && v->id_viz != no1){
 			ant = v;
@@ -162,7 +161,7 @@ void imprime(TG *g){
 		printf("%d -> ", p->id_no);
 		TViz *v = p->prim_viz;
 		while(v){
-			printf("%d ", v->id_viz);
+			printf("%d ", v->id_viz); // vizinhos
 			v = v->prox_viz;
 		}
 		printf("\n");
@@ -170,8 +169,25 @@ void imprime(TG *g){
 	}
 }
 
-int main(int argc, char const *argv[])
-{
+int orientado(TG *g){
+	TNo *p = g->prim;
+	while(p){
+		TViz *v = p->prim_viz;
+		while(v){
+			TViz *u = busca_aresta(g, v->id_viz, p->id_no);
+			if(!u){
+				return 0;
+			}
+			v = v->prox_viz;
+		}
+		p = p->prox_no;
+	}
+	return 1;
+}
+
+
+
+int main(int argc, char const *argv[]){
 	FILE *fp = fopen(argv[1], "rt");
 	if(!fp)
 		exit(1);
@@ -188,6 +204,10 @@ int main(int argc, char const *argv[])
 		insere_aresta(g, v1, v2, 1);
 	}
 	imprime(g);
+	if(orientado(g))
+		printf("Orientado\n");
+	else
+		printf("Nao orientado\n");
 	fclose(fp);
 	return 0;
 }
