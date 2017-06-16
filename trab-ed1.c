@@ -185,18 +185,42 @@ int orientado(TG *g){
 	return 1;
 }
 
-int busca_conectados(TG *g, int *vertices, int qtd_nos, int cont){
-	TNo 
+int busca_prof(TG *g, TNo *no, int *visitados, int qtd_nos){
+	TNo *p = no;
+	visitados[p->id_no-1] = 1;
+
+	while(p){
+		TViz *v = p->prim_viz;
+		if(!v){
+			return 0;			
+		} else {
+			while(v){
+				if(!visitados[v->id_viz-1]){
+					TNo *aux = busca_no(g, v->id_viz);
+					visitados[v->id_viz-1] = 1;
+					busca_prof(g, aux, visitados, qtd_nos);
+				}
+				v = v->prox_viz;
+			}
+		p = p->prox_no;
+		}
+		
+	}
+	for (int i = 0; i < qtd_nos; ++i){
+		if(!visitados[i])
+			return 0;
+	}
+	return 1;
 }
 
 int conexo(TG *g, int qtd_nos){
-	int vertices[qtd_nos], cont = 1;
-	TNo *p = g->prim;
+	int visitados[qtd_nos];
 	for (int i = 0; i < qtd_nos; ++i){
-		vertices[i] = p->id_no;
-		p = p->prox_no;
+		visitados[i] = 0;
 	}
-	return busca_conectados(g, vertices, qtd_nos, cont);
+	TNo *p = g->prim;
+	return busca_prof(g, p, visitados, qtd_nos);
+
 }
 
 int main(int argc, char const *argv[]){
@@ -217,10 +241,10 @@ int main(int argc, char const *argv[]){
 		insere_aresta(g, v1, v2, 1);
 	}
 	imprime(g);
-	if(orientado(g))
-		printf("Orientado\n");
+	if(conexo(g, n_nos))
+		printf("Conexo\n");
 	else
-		printf("Nao orientado\n");
+		printf("Desconexo\n");
 	
 	libera(g);
 	fclose(fp);
