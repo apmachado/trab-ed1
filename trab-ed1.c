@@ -185,7 +185,19 @@ int orientado(TG *g){
 	return 1;
 }
 
+int busca_conectados(TG *g, int *vertices, int qtd_nos, int cont){
+	TNo 
+}
 
+int conexo(TG *g, int qtd_nos){
+	int vertices[qtd_nos], cont = 1;
+	TNo *p = g->prim;
+	for (int i = 0; i < qtd_nos; ++i){
+		vertices[i] = p->id_no;
+		p = p->prox_no;
+	}
+	return busca_conectados(g, vertices, qtd_nos, cont);
+}
 
 int main(int argc, char const *argv[]){
 	FILE *fp = fopen(argv[1], "rt");
@@ -196,11 +208,12 @@ int main(int argc, char const *argv[]){
 	int n_nos;
 	fscanf(fp, "%d", &n_nos);
 	printf("Quantidade de vertices: %d\n", n_nos);
+	for (int i = 1; i <= n_nos; ++i){
+		insere_no(g, i);
+	}
 	while(!feof(fp)){
 		int v1, v2;
 		fscanf(fp, "%d %d", &v1, &v2);
-		insere_no(g, v1);
-		insere_no(g, v2);
 		insere_aresta(g, v1, v2, 1);
 	}
 	imprime(g);
@@ -208,6 +221,8 @@ int main(int argc, char const *argv[]){
 		printf("Orientado\n");
 	else
 		printf("Nao orientado\n");
+	
+	libera(g);
 	fclose(fp);
 	return 0;
 }
